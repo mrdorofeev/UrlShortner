@@ -1,0 +1,23 @@
+version: "3"
+services:
+  app:
+    container_name: docker-urlshortner
+    build: ./urlshortner
+    ports:
+      - "5000:5000"
+    depends_on:
+      - sqlite-container
+
+  sqlite-container:
+    image: alpine:latest
+    command: sh -c "apk --no-cache add sqlite 
+              && cp /data/initial-db.sqlite /data/db.sqlite 
+              && sqlite3 /data/db.sqlite < /data/init.sql 
+              && tail -f /dev/null"
+    environment:
+      - DB_USER=sqlite
+      - DB_PASSWORD=root
+      - DB_NAME=shortner
+    container_name: sqlite-container
+    ports:
+      - "5432:5432"
